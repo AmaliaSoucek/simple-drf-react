@@ -1,0 +1,8 @@
+dj-database-url
+Django
+djangorestframework
+django-cors-headers
+Pillow
+django-allauth
+django-rest-auth
+factory-boy
