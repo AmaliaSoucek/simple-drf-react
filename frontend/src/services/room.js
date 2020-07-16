@@ -11,15 +11,15 @@ class RoomDataService {
   }
 
   create(data) {
-    return http.post("/core/rooms", data);
+    return http.post("/core/rooms/", data);
   }
 
   update(id, data) {
-    return http.put(`/core/rooms/${id}`, data);
+    return http.patch(`/core/rooms/${id}/`, data);
   }
 
   delete(id) {
-    return http.delete(`/core/rooms/${id}`);
+    return http.delete(`/core/rooms/${id}/`);
   }
 
 }

@@ -1,7 +1,6 @@
 @import "bootstrap/scss/_functions.scss";
 @import "bootstrap/scss/_variables.scss";
 
-
 $theme-colors: (
   "primary": pink,
   "danger": #ff6699,
@@ -18,11 +17,13 @@ $font-family-base: Raleway;
 $card-bg: #092f40;
 $card-border-color: pink;
 $input-bg: #1e4659;
+$input-disabled-bg: #031016;
 $input-color: #33cccc;
 $input-border-color: #33cccc;
 $input-focus-bg: #1e4659;
 $input-focus-color: white;
 $navbar-dark-color: pink;
 $table-color: white;
+
 
 @import 'bootstrap';
