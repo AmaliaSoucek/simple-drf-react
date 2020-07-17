@@ -9,7 +9,6 @@ import UserContext from '../userContext';
 function Profile() {
   const context = useContext(UserContext);
 
-  console.log(context.user);
   if (!context.user)
     return <Link to="login" className="nav-link">Login</Link>;
 
@@ -35,7 +34,8 @@ function Header() {
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="mr-auto">
-          <Link to="room-list" className="nav-link">Rooms</Link>
+          <Link to="rooms" className="nav-link">Rooms</Link>
+          <Link to="reservations" className="nav-link">Reservations</Link>
           <Link to="my_bookings" className="nav-link">My Bookings</Link>
         </Nav>
         <Nav className="ml-auto">

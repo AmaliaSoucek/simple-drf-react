@@ -1,9 +1,10 @@
 import React from 'react';
 import Header from './Header';
 import Container from 'react-bootstrap/Container';
-import Home from './Home';
-import RoomList from './RoomList';
-import Login from './Login';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Rooms from './pages/Rooms';
+import Reservations from './pages/Reservations';
 import { Router } from "@reach/router";
 import {UserContextProvider} from '../userContext';
 
@@ -16,8 +17,9 @@ function App() {
         <Container className="p-5">
           <Router>
             <Home path="/"/>
-            <RoomList path="room-list"/>
             <Login path="login"/>
+            <Rooms path="rooms"/>
+            <Reservations path="reservations"/>
           </Router>
         </Container>
       </UserContextProvider>

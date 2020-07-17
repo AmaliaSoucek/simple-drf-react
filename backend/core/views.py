@@ -2,11 +2,14 @@ from rest_framework import viewsets
 
 from . import permissions
 from .models import Reservation, Room
-from .serializers import ReservationSerializer, RoomSerializer
+from .serializers import (
+    ReservationSerializer, RoomSerializer,
+)
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = Reservation.objects.all()
+    queryset = Reservation.objects\
+        .prefetch_related('rooms').select_related('user'). all()
     serializer_class = ReservationSerializer
     permission_classes = (permissions.Reservation,)
 

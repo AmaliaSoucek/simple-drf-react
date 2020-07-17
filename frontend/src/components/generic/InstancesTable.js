@@ -1,10 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import RoomServiceData from '../services/room.js';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 import {Pencil, Trash, Check, X, Plus} from 'react-bootstrap-icons';
 
 
@@ -24,44 +23,10 @@ function FieldError(props) {
 }
 
 
-function EditRow(props) {
+function InstanceEditRow(props) {
     return (
       <tr>
-        <td>
-            <Form.Control
-                disabled={!!props.instance}
-                type="text"
-                name="number"
-                onChange={(e) => props.setFormInput(e)}
-                defaultValue={props.instance ? props.instance.number: ''}
-                isInvalid={!!props.errors.number}
-            />
-            <FieldError errors={props.errors.number}/>
-          </td>
-        <td>
-          <Form.Control
-              as="select"
-              name="type"
-              onChange={(e) => props.setFormInput(e)}
-              defaultValue={props.instance ? props.instance.type: ''}
-              isInvalid={!!props.errors.type}
-          >
-            <option>single</option>
-            <option>double</option>
-            <option>twin</option>
-          </Form.Control>
-          <FieldError errors={props.errors.type}/>
-        </td>
-        <td>
-          <Form.Control
-              type="text"
-              name="price"
-              onChange={(e) => props.setFormInput(e)}
-              defaultValue={props.instance ? props.instance.price: ''}
-              isInvalid={!!props.errors.price}
-          />
-          <FieldError errors={props.errors.price}/>
-        </td>
+        { props.children }
         <td className="text-right">
           <Button
               hidden={!!props.instance}
@@ -73,7 +38,7 @@ function EditRow(props) {
           </Button>
           <Button
               hidden={!props.instance}
-              className="ml-2"
+              className="ml-2 mb-2"
               variant="outline-success"
               onClick={props.updateInstance}
           >
@@ -81,7 +46,7 @@ function EditRow(props) {
           </Button>
           <Button
               hidden={!props.instance}
-              className="ml-2"
+              className="ml-2 mb-2"
               variant="outline-danger"
               onClick={props.exitEdit}
           >
@@ -93,75 +58,22 @@ function EditRow(props) {
 }
 
 
-function Room(props) {
-  const [edit, setEdit] = useState(false);
-  const openEdit = () => {setEdit(true)};
-  const exitEdit = () => {setEdit(false)};
-
-  const [form, setForm] = useState(props.instance ? {...props.instance} : {'type': 'single'});
-  const [errors, setErrors] = useState({});
-  const setFormInput = (event) => {
-    let newForm = {...form};
-    newForm[event.target.name] = event.target.value;
-    setForm(newForm);
-  };
-
-  const updateInstance = () => {
-    RoomServiceData.update(props.instance.id, form)
-        .then(response => {
-          props.updateInstance(props.instance.id, response.data);
-          exitEdit();
-        })
-        .catch(function (e) {
-          if (e.response)
-            setErrors(e.response.data);
-        })
-  };
-
-  const createInstance = () => {
-    RoomServiceData.create(form)
-        .then(response => {
-          props.createInstance(response.data);
-        })
-        .catch(function (e) {
-          if (e.response)
-            setErrors(e.response.data);
-        })
-  };
-
-  if (!props.instance) {
-    return <EditRow
-        errors={errors}
-        createInstance={createInstance}
-        setFormInput={setFormInput}
-    />
-  }
-
-  if (edit) {
-    return <EditRow
-        instance={props.instance}
-        errors={errors}
-        exitEdit={exitEdit}
-        updateInstance={updateInstance}
-        setFormInput={setFormInput}
-    />
-  }
-
+function InstanceShowRow(props) {
   return (
     <tr>
-      <td>{props.instance.number}</td>
-      <td>{props.instance.type}</td>
-      <td>{props.instance.price}€</td>
+      {
+        props.children
+      }
       <td className="text-right">
         <Button
-            className="ml-2"
+            className="ml-2 mb-2"
             variant="outline-secondary"
-            onClick={openEdit}
+            onClick={props.openEdit}
         >
           <Pencil/>
         </Button>
         <Button
-            className="ml-2"
+            className="ml-2 mb-2"
             variant="outline-danger"
             onClick={props.deleteInstance}
         >
@@ -173,18 +85,93 @@ function Room(props) {
 }
 
 
-function RoomList() {
+function InstanceRow(props) {
+  const service = props.service;
+
+  const [edit, setEdit] = useState(false);
+  const openEdit = () => {setEdit(true)};
+  const exitEdit = () => {setEdit(false)};
+
+  const [form, setForm] = useState(
+      props.instance ? {...props.instance} : props.initialForm
+  );
+  const [errors, setErrors] = useState({});
+  const setFormInput = (event) => {
+    let newForm = {...form};
+
+    if (event.target.multiple) {
+      newForm[event.target.name] = Array.from(
+          event.target.selectedOptions, option => option.value
+      );
+    } else {
+      newForm[event.target.name] = event.target.value;
+    }
+    setForm(newForm);
+  };
+
+  const updateInstance = () => {
+    service.update(props.instance.id, form)
+        .then(response => {
+          props.updateInstance(props.instance.id, response.data);
+          exitEdit();
+        })
+        .catch(function (e) {
+          if (e.response)
+            setErrors(e.response.data);
+        })
+  };
+
+  const createInstance = () => {
+    service.create(form)
+        .then(response => {
+          props.createInstance(response.data);
+        })
+        .catch(function (e) {
+          if (e.response)
+            setErrors(e.response.data);
+        })
+  };
+
+  if (!props.instance) {
+    return <props.EditRow
+        errors={errors}
+        createInstance={createInstance}
+        setFormInput={setFormInput}
+    />
+  }
+
+  if (edit) {
+    return <props.EditRow
+        instance={props.instance}
+        errors={errors}
+        exitEdit={exitEdit}
+        updateInstance={updateInstance}
+        setFormInput={setFormInput}
+    />
+  }
+
+  return (
+      <props.ShowRow
+          instance={props.instance}
+          openEdit={openEdit}
+          deleteInstance={props.deleteInstance}
+      />
+  )
+}
+
+
+function InstancesTable(props) {
   const [instances, setInstances] = useState([]);
+  const dataGetter = props.service.getAll;
 
   useEffect(() => {
-    RoomServiceData.getAll()
-      .then(response => {
+    dataGetter().then(response => {
         setInstances(response.data['results']);
       });
-  }, []);
+  }, [dataGetter]);
 
   const deleteInstance = (id) => {
-    RoomServiceData.delete(id).then(() => {
+    props.service.delete(id).then(() => {
       setInstances([...instances].filter(instance => instance.id !== id));
     })
   };
@@ -203,25 +190,37 @@ function RoomList() {
   return (
     <Row>
       <Container>
-        <h1 className="mb-5">Rooms</h1>
+        <h1 className="mb-5">{props.title}</h1>
         <Table responsive="lg">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Type</th>
-              <th>Price</th>
+              {
+                props.header.map((field, index) => (
+                    <th key={index}>{field}</th>
+                ))
+              }
               <th className="text-right">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
-            <Room key='new' createInstance={createInstance}/>
+            <InstanceRow
+                key='new'
+                createInstance={createInstance}
+                service={props.service}
+                initialForm={props.initialForm}
+                EditRow={props.EditRow}
+            />
             {
               instances.map((instance, index) => (
-                  <Room
+                  <InstanceRow
                       key={instance.id}
                       instance={instance}
                       deleteInstance={() => deleteInstance(instance.id)}
                       updateInstance={updateInstance}
+                      fields={props.fields}
+                      EditRow={props.EditRow}
+                      ShowRow={props.ShowRow}
+                      service={props.service}
                   />)
               )
             }
@@ -232,4 +231,4 @@ function RoomList() {
   )
 }
 
-export default RoomList;
+export {InstancesTable, FieldError, InstanceEditRow, InstanceShowRow};

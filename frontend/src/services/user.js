@@ -15,6 +15,10 @@ class UserDataService {
   getUser() {
     return http.get("/auth/user/")
   }
+
+  getAll() {
+    return http.get("/auth/users/")
+  }
 }
 
 export default new UserDataService();
